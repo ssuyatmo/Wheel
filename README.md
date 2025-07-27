@@ -44,7 +44,86 @@
       <li class="nav-item"><a class="nav-link" onclick="ubahTab('sandi')">Ganti Sandi</a></li>  
       <li class="nav-item"><a class="nav-link" onclick="ubahTab('logout')">Logout</a></li>  
     </ul>  <div class="tab-pane active" id="login">  
-    <h3>Login</h3>  
+      
+    <div class="midlife-komponen">
+  <h3>Midlife Komponen</h3>
+  <form>
+    <label><input type="checkbox" name="midlife" value="FIRE SUSPRESSION"> FIRE SUSPRESSION (Interval: 6.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="ALTERNATOR"> ALTERNATOR (Interval: 10.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="STARTING MOTOR UP 1"> STARTING MOTOR UP (Interval: 10.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="STARTING MOTOR UP 2"> STARTING MOTOR UP (Interval: 10.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="WATER PUMP"> WATER PUMP (Interval: 12.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="TENSION PULLEY"> TENSION PULLEY (Interval: 15.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="STEERING CYLINDER RH"> STEERING CYLINDER RH (Interval: 19.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="STEERING CYLINDER LH"> STEERING CYLINDER LH (Interval: 19.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="VALVE SUSPENSION"> VALVE SUSPENSION (Interval: 8.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="INJECTOR"> INJECTOR (Interval: 15.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="DAMPER ENGINE"> DAMPER ENGINE (Interval: 12.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="EVAPORATOR"> EVAPORATOR (Interval: 6.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="STEERING VALVE"> STEERING VALVE (Interval: 8.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="BUSHING TORQ ROD & RADIUS ROD"> BUSHING TORQ ROD & RADIUS ROD (Interval: 19.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="ADJUST VALVE"> ADJUST VALVE (Interval: 7.500)</label><br>
+    <label><input type="checkbox" name="midlife" value="FRONT SUSPENSION RH"> FRONT SUSPENSION RH (Interval: 16.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="FRONT SUSPENSION LH"> FRONT SUSPENSION LH (Interval: 16.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="REAR SUSPENSION RH"> REAR SUSPENSION RH (Interval: 16.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="REAR SUSPENSION LH"> REAR SUSPENSION LH (Interval: 16.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="HOIST CYLINDER RH"> HOIST CYLINDER RH (Interval: 25.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="HOIST CYLINDER LH"> HOIST CYLINDER LH (Interval: 25.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="ADJUST DIFFERENTIAL"> ADJUST DIFFERENTIAL (Interval: 23.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="TURBO CHARGER RH"> TURBO CHARGER RH (Interval: 20.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="TURBO CHARGER LH"> TURBO CHARGER LH (Interval: 20.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="CLEANING FUEL TANK"> CLEANING FUEL TANK (Interval: 6.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="CYLINDER HEAD"> CYLINDER HEAD (Interval: 28.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="RUBBER CUSHION T/M"> RUBBER CUSHION T/M (Interval: 24.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="REBUSHING STEERING LINK"> REBUSHING STEERING LINK (Interval: 19.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="REBUSHING FRONT AXLE"> REBUSHING FRONT AXLE (Interval: 12.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="REBUSHING REAR AXLE"> REBUSHING REAR AXLE (Interval: 12.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="REBUSHING VESSEL"> REBUSHING VESSEL (Interval: 12.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="COMPRESSOR + CLUTCH AC"> COMPRESSOR + CLUTCH AC (Interval: 8.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="AIR COMPRESSOR"> AIR COMPRESSOR (Interval: 8.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="REHOSE AC"> REHOSE AC (Interval: 24.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="REHOSE FRONT BRAKE COOLING"> REHOSE FRONT BRAKE COOLING (Interval: 6.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="REHOSE REAR BRAKE COOLING"> REHOSE REAR BRAKE COOLING (Interval: 6.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="REHOSE HOIST CYLINDER"> REHOSE HOIST CYLINDER (Interval: 8.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="REHOSE STEERING VALVE"> REHOSE STEERING VALVE (Interval: 8.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="MOTOR BLOWER AC"> MOTOR BLOWER AC (Interval: 12.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="OIL PUMP"> OIL PUMP (Interval: 18.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="AUTOLUB"> AUTOLUB (Interval: 6.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="OPERATOR SEAT"> OPERATOR SEAT (Interval: 12.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="VISCOUS MOUNTING CABIN"> VISCOUS MOUNTING CABIN (Interval: 12.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="COMMON RAIL SENSOR RH"> COMMON RAIL SENSOR RH (Interval: 6.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="COMMON RAIL SENSOR LH"> COMMON RAIL SENSOR LH (Interval: 6.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="P/T PUMP"> P/T PUMP (Interval: 12.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="STEERING PUMP"> STEERING PUMP (Interval: 24.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="T/M PUMP"> T/M PUMP (Interval: 24.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="B/C PUMP"> B/C PUMP (Interval: 24.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="HYDRAULIC PUMP"> HYDRAULIC PUMP (Interval: 25.000)</label><br>
+    <label><input type="checkbox" name="midlife" value="CLEANING RADIATOR & AF COOLER"> CLEANING RADIATOR & AF COOLER (Interval: 20.000)</label><br>
+  </form>
+</div>
+
+        <button class="btn btn-success" onclick="simpanChecklist()">Simpan Checklist</button>
+      </div>
+
+      <div class="tab-pane" id="riwayat">
+        <h3>Riwayat Checklist</h3>
+        <input type="text" class="form-control mb-2" id="cari" placeholder="Cari berdasarkan unit atau catatan..." oninput="tampilkanRiwayat()">
+        <div id="listRiwayat"></div>
+      </div>
+
+      <div class="tab-pane" id="sandi">
+        <h3>Ganti Sandi</h3>
+        <input type="password" class="form-control mb-2" id="sandiBaru" placeholder="Sandi Baru">
+        <button class="btn btn-warning" onclick="gantiSandi()">Ganti</button>
+      </div>
+
+      <div class="tab-pane" id="logout">
+        <h3>Logout</h3>
+        <button class="btn btn-danger" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+<h3>Login</h3>  
     <p class="text-warning"><strong></strong></p>  
     <input type="password" id="loginPass" class="form-control mb-2" placeholder="Masukan Sandi">  
     <button class="btn btn-primary" onclick="doLogin()">Login</button>  
