@@ -87,9 +87,7 @@
     <input type="file" class="form-control mb-2" id="gambar3">  
     <input type="file" class="form-control mb-2" id="gambar4">  
     <input type="file" class="form-control mb-2" id="gambar5">  
-    <button class="btn btn-success" onclick="simpanChecklist()">Simpan Checklist</button>  
-  </div>  
-3>Midlife Komponen</h3>
+    3>Midlife Komponen</h3>
   <form>
     <label><input type="checkbox" name="midlife" value="FIRE SUSPRESSION"> FIRE SUSPRESSION (Interval: 6.000)</label><br>
     <label><input type="checkbox" name="midlife" value="ALTERNATOR"> ALTERNATOR (Interval: 10.000)</label><br>
@@ -144,6 +142,8 @@
     <label><input type="checkbox" name="midlife" value="CLEANING RADIATOR & AF COOLER"> CLEANING RADIATOR & AF COOLER (Interval: 20.000)</label><br>
   </form>
 </div>
+
+  </div>  
 
   <div class="tab-pane" id="riwayat">  
     <h3>Riwayat Checklist</h3>  
