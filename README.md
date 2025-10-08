@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Camera & Firebase OCR & WA</title>
+<title>Camera / Upload OCR & WhatsApp</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -19,10 +19,19 @@ button,input,select{padding:10px;margin-top:8px;border-radius:8px;border:1px sol
 </head>
 <body>
 
-<h2>Camera & Firebase OCR & WA</h2>
-<video id="video" autoplay playsinline></video>
-<input type="file" id="uploadPhoto" accept="image/*">
-<button id="capture">📸 Ambil Foto & OCR</button>
+<h2>Camera / Upload OCR & WhatsApp</h2>
+
+<!-- Pilih sumber foto -->
+<select id="photoSource">
+  <option value="camera">📷 Kamera</option>
+  <option value="upload">🖼️ Upload Foto</option>
+</select>
+
+<!-- Kamera -->
+<video id="video" autoplay playsinline style="display:block;"></video>
+<input type="file" id="uploadPhoto" accept="image/*" style="display:none">
+
+<button id="capture">Ambil Foto & OCR</button>
 <img id="photoPreview" alt="Preview" style="display:none"/>
 <div id="progressContainer"><div id="progressBar">0%</div></div>
 <textarea id="ocrResult" placeholder="Hasil OCR akan muncul disini..."></textarea>
@@ -43,45 +52,67 @@ firebase.initializeApp(firebaseConfig);
 firebase.auth().signInAnonymously().catch(console.error);
 const storage = firebase.storage();
 
-// Kamera
 const video = document.getElementById('video');
-navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}})
-.then(stream=>video.srcObject=stream)
-.catch(e=>alert('Kamera error: '+e.message));
-
+const uploadPhoto = document.getElementById('uploadPhoto');
 const canvas = document.createElement('canvas');
 const photoPreview = document.getElementById('photoPreview');
 const ocrResult = document.getElementById('ocrResult');
 const progressContainer = document.getElementById('progressContainer');
 const progressBar = document.getElementById('progressBar');
 const ocrLangInput = document.getElementById('ocrLang');
+const captureBtn = document.getElementById('capture');
+const sendWA = document.getElementById('sendWA');
+const photoSource = document.getElementById('photoSource');
 
-// Ambil foto & OCR
-document.getElementById('capture').addEventListener('click', async ()=>{
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video,0,0);
-  const dataUrl = canvas.toDataURL('image/png');
-  photoPreview.src = dataUrl;
-  photoPreview.style.display='block';
-  await uploadAndOCR(dataUrl);
+let stream = null;
+
+// Fungsi start kamera
+async function startCamera(){
+  if(stream) stream.getTracks().forEach(t=>t.stop());
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}, audio:false});
+    video.srcObject = stream;
+  }catch(err){alert('Kamera error: '+err.message);}
+}
+
+// Tampilkan sesuai pilihan
+photoSource.addEventListener('change', ()=>{
+  if(photoSource.value==='camera'){
+    video.style.display='block';
+    uploadPhoto.style.display='none';
+    startCamera();
+  } else {
+    video.style.display='none';
+    uploadPhoto.style.display='block';
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+  }
 });
 
-// Upload foto
-document.getElementById('uploadPhoto').addEventListener('change', async (e)=>{
-  if(!e.target.files[0]) return;
-  const file = e.target.files[0];
-  const reader = new FileReader();
-  reader.onload = async ()=> {
-    const dataUrl = reader.result;
+// Ambil foto dari kamera
+captureBtn.addEventListener('click', async ()=>{
+  if(photoSource.value==='camera'){
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video,0,0);
+    const dataUrl = canvas.toDataURL('image/png');
     photoPreview.src = dataUrl;
     photoPreview.style.display='block';
     await uploadAndOCR(dataUrl);
-  };
-  reader.readAsDataURL(file);
+  } else if(photoSource.value==='upload'){
+    if(uploadPhoto.files.length===0){ alert('Pilih foto untuk upload'); return; }
+    const file = uploadPhoto.files[0];
+    const reader = new FileReader();
+    reader.onload = async ()=>{
+      const dataUrl = reader.result;
+      photoPreview.src = dataUrl;
+      photoPreview.style.display='block';
+      await uploadAndOCR(dataUrl);
+    };
+    reader.readAsDataURL(file);
+  }
 });
 
-// Upload ke Firebase + OCR
+// Upload ke Firebase & OCR
 async function uploadAndOCR(dataUrl){
   progressContainer.style.display='block';
   progressBar.style.width='0%';
@@ -89,13 +120,11 @@ async function uploadAndOCR(dataUrl){
   ocrResult.value='Sedang memproses...';
 
   try{
-    // Convert dataURL ke blob
     const blob = await (await fetch(dataUrl)).blob();
     const filename = 'foto_'+Date.now()+'.png';
     const ref = storage.ref().child(filename);
     await ref.put(blob);
 
-    // OCR
     const lang = ocrLangInput.value || 'eng';
     const worker = Tesseract.createWorker({
       logger:m=>{
@@ -118,10 +147,13 @@ async function uploadAndOCR(dataUrl){
 }
 
 // Kirim WA
-document.getElementById('sendWA').addEventListener('click', ()=>{
+sendWA.addEventListener('click', ()=>{
   const text = encodeURIComponent(ocrResult.value || '');
   window.open(`https://wa.me/?text=${text}`,'_blank');
 });
+
+// Inisialisasi kamera saat pertama kali jika default Camera
+if(photoSource.value==='camera') startCamera();
 </script>
 
 </body>
