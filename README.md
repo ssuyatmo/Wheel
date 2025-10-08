@@ -3,30 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Camera OCR & WhatsApp</title>
+<title>Camera & Upload OCR & WhatsApp</title>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
 <style>
 :root{
-  --bg:#f9f9f9;
-  --fg:#222;
-  --card:#fff;
-  --accent:#4caf50;
-  --accent-dark:#1976d2;
-  --accent-purple:#6a1b9a;
+  --bg:#f9f9f9; --fg:#222; --card:#fff; --accent:#4caf50; --accent-dark:#1976d2; --accent-purple:#6a1b9a;
 }
-body{
-  font-family: Arial, Helvetica, sans-serif;
-  margin:0;
-  padding:16px;
-  background:var(--bg);
-  color:var(--fg);
-}
-body.dark{
-  --bg:#222;
-  --fg:#f0f0f0;
-  background:var(--bg);
-  color:var(--fg);
-}
+body{font-family: Arial, Helvetica, sans-serif;margin:0;padding:16px;background:var(--bg);color:var(--fg);}
+body.dark{--bg:#222;--fg:#f0f0f0;background:var(--bg);color:var(--fg);}
 header{display:flex;align-items:center;gap:12px;margin-bottom:8px}
 h1{font-size:1.2rem;margin:0}
 .card{background:var(--card);padding:12px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-top:12px}
@@ -38,28 +22,34 @@ textarea{width:100%;height:160px;padding:8px;border-radius:8px;border:1px solid 
 #progressContainer{width:100%;background:#eee;border-radius:8px;overflow:hidden;margin-top:8px;height:18px;display:none}
 #progressBar{width:0%;height:100%;background:var(--accent);color:#fff;text-align:center;line-height:18px;font-size:12px}
 footer{font-size:12px;color:#666;margin-top:12px;text-align:center}
-@media(min-width:720px){
-  main{max-width:720px;margin:0 auto}
-}
-select, input[type=number]{padding:8px;border-radius:8px;border:1px solid #ddd}
+@media(min-width:720px){main{max-width:720px;margin:0 auto}}
+select, input[type=number], input[type=file]{padding:8px;border-radius:8px;border:1px solid #ddd}
 </style>
 </head>
 <body>
 
 <main>
 <header>
-<h1>Camera OCR & WhatsApp</h1>
+<h1>Camera & Upload OCR & WhatsApp</h1>
 </header>
 
 <section class="card">
+  <!-- Kamera -->
   <video id="video" autoplay playsinline></video>
   <div class="row">
     <button id="capture">📸 Ambil Foto & OCR</button>
     <button id="switchCam" style="background:var(--accent-dark)">🔁 Ganti Kamera</button>
   </div>
 
+  <!-- Upload Foto -->
+  <div class="row">
+    <input type="file" id="uploadPhoto" accept="image/*"/>
+  </div>
+
+  <!-- Preview Foto -->
   <img id="photoPreview" alt="Preview Foto" style="display:none"/>
 
+  <!-- Progress OCR -->
   <div id="progressContainer">
     <div id="progressBar">0%</div>
   </div>
@@ -93,7 +83,7 @@ select, input[type=number]{padding:8px;border-radius:8px;border:1px solid #ddd}
 <strong>Petunjuk:</strong>
 <ol>
   <li>Izinkan akses kamera di browser.</li>
-  <li>Pilih bahasa OCR & tekan "Ambil Foto & OCR".</li>
+  <li>Pilih bahasa OCR & tekan "Ambil Foto & OCR", atau upload foto.</li>
   <li>Setelah selesai, teks dapat diedit & dikirim ke WhatsApp.</li>
 </ol>
 <div>Built with Tesseract.js — semua proses OCR dilakukan di browser (offline).</div>
@@ -114,18 +104,18 @@ let progressBar = document.getElementById('progressBar');
 let switchCamBtn = document.getElementById('switchCam');
 let fontSizeInput = document.getElementById('fontSize');
 let themeSelect = document.getElementById('theme');
+let uploadPhoto = document.getElementById('uploadPhoto');
 
 let stream = null;
 let useFront = false;
 
+// Camera
 async function startCamera(){
   if(stream) stream.getTracks().forEach(t=>t.stop());
   try{
     stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:useFront?'user':'environment'}, audio:false});
     video.srcObject = stream;
-  }catch(err){
-    alert("Gagal mengakses kamera: "+err.message);
-  }
+  }catch(err){alert("Gagal mengakses kamera: "+err.message);}
 }
 startCamera();
 
@@ -134,6 +124,7 @@ switchCamBtn.addEventListener('click', async ()=>{
   await startCamera();
 });
 
+// OCR dari kamera
 captureBtn.addEventListener('click', async ()=>{
   if(!video.videoWidth){ alert('Kamera belum siap.'); return;}
   canvas.width = video.videoWidth;
@@ -142,12 +133,32 @@ captureBtn.addEventListener('click', async ()=>{
   ctx.drawImage(video,0,0,canvas.width,canvas.height);
   photoPreview.src = canvas.toDataURL('image/png');
   photoPreview.style.display='block';
+  runOCR(canvas);
+});
 
+// OCR dari upload foto
+uploadPhoto.addEventListener('change', async (e)=>{
+  if(!e.target.files || !e.target.files[0]) return;
+  let file = e.target.files[0];
+  let img = new Image();
+  img.onload = ()=>{
+    canvas.width = img.width;
+    canvas.height = img.height;
+    let ctx = canvas.getContext('2d');
+    ctx.drawImage(img,0,0);
+    photoPreview.src = canvas.toDataURL('image/png');
+    photoPreview.style.display='block';
+    runOCR(canvas);
+  };
+  img.src = URL.createObjectURL(file);
+});
+
+// Fungsi OCR
+async function runOCR(canvas){
   progressContainer.style.display='block';
   progressBar.style.width='0%';
   progressBar.innerText='0%';
   ocrResult.value='Sedang memproses OCR...';
-
   try{
     const lang = ocrLang.value || 'eng';
     const worker = Tesseract.createWorker({
@@ -174,8 +185,9 @@ captureBtn.addEventListener('click', async ()=>{
     progressBar.style.width='0%';
     progressBar.innerText='Error';
   }
-});
+}
 
+// Download foto
 downloadBtn.addEventListener('click', ()=>{
   if(!canvas.width){ alert('Belum ada foto untuk didownload.'); return;}
   let link = document.createElement('a');
@@ -184,17 +196,20 @@ downloadBtn.addEventListener('click', ()=>{
   link.click();
 });
 
+// Kirim WA
 sendWA.addEventListener('click', ()=>{
   let text = encodeURIComponent(ocrResult.value||'');
   window.open(`https://wa.me/?text=${text}`,'_blank');
 });
 
-fontSizeInput.addEventListener('change', ()=>{
-  ocrResult.style.fontSize=fontSizeInput.value+'px';
-});
-
+// Tema
 themeSelect.addEventListener('change', ()=>{
   document.body.className = themeSelect.value==='dark'?'dark':'';
+});
+
+// Font size
+fontSizeInput.addEventListener('change', ()=>{
+  ocrResult.style.fontSize=fontSizeInput.value+'px';
 });
 </script>
 
