@@ -31,7 +31,7 @@ header {
 }
 .container {
   padding: 10px; max-width: 600px; margin: auto;
-  margin-top: 250px;
+  margin-top: 260px;
 }
 .card {
   background: #fff; border-radius: 10px;
@@ -68,7 +68,7 @@ button.main {
   background: #f1d28a; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* Popup preview */
+/* Popup preview & edit temuan */
 #previewPopup, #editPopup {
   display: none; position: fixed; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
@@ -81,8 +81,6 @@ button.main {
   font-size: 13px; margin-bottom: 10px;
 }
 #popupButtons { display: flex; justify-content: space-around; }
-
-/* Popup edit temuan */
 #editPopup textarea {
   width: 100%; height: 100px; resize: none;
   border-radius: 6px; border: 1px solid #aaa; padding: 6px;
@@ -119,6 +117,14 @@ button.main {
 
 <div class="container" id="mainContent">
   <div id="sections"></div>
+
+  <!-- Deviation manual -->
+  <div class="card" id="deviationSection">
+    <h3>⚠️ Deviation (Tambahkan jika ada)</h3>
+    <div id="deviationList"></div>
+    <button class="main" onclick="addDeviation()">➕ Tambah Deviation</button>
+  </div>
+
   <div class="buttons">
     <button class="main" onclick="showPreview()">🧾 Preview</button>
     <button class="main" onclick="sendToWhatsApp()">📤 Send WA</button>
@@ -166,6 +172,7 @@ const inspectionSections = [
 ];
 
 let currentEditId = null;
+let deviationCount = 0;
 
 function renderSections(){
   const qaType = document.getElementById('qaType').value;
@@ -217,12 +224,14 @@ function toggleButton(el,val,id){
 
   const imgInput = document.getElementById(`img_${id}`);
   const previewImg = document.getElementById(`preview_${id}`);
-  if(val === 'Not OK'){
-    imgInput.style.display = 'block';
-    previewImg.style.display = previewImg.src ? 'block' : 'none';
-  } else {
-    imgInput.style.display = 'none';
-    previewImg.style.display = 'none';
+  if(imgInput){
+    if(val === 'Not OK'){
+      imgInput.style.display = 'block';
+      previewImg.style.display = previewImg.src ? 'block' : 'none';
+    } else {
+      imgInput.style.display = 'none';
+      previewImg.style.display = 'none';
+    }
   }
 }
 
@@ -239,7 +248,7 @@ function previewImage(id, event){
   }
 }
 
-/* === Popup temuan melayang === */
+/* === Popup edit temuan === */
 function openEdit(id){
   currentEditId = id;
   const text = document.getElementById(`note_${id}`).value;
@@ -252,6 +261,21 @@ function saveEdit(){
     document.getElementById(`note_${currentEditId}`).value = newText;
   }
   document.getElementById('editPopup').style.display = 'none';
+}
+
+/* === Tambah Deviation Manual === */
+function addDeviation(){
+  deviationCount++;
+  const id = "dev"+deviationCount;
+  const div = document.createElement('div');
+  div.className = "card";
+  div.innerHTML = `
+    <label>Deviation ${deviationCount}:</label>
+    <textarea id="note_${id}" placeholder="Tuliskan deviation..." onclick="openEdit('${id}')"></textarea>
+    <input type="file" accept="image/*" id="img_${id}" onchange="previewImage('${id}', event)">
+    <img id="preview_${id}" class="preview">
+  `;
+  document.getElementById('deviationList').appendChild(div);
 }
 
 /* === Preview WhatsApp === */
@@ -278,6 +302,17 @@ function generateText(){
     });
     text+=`\n`;
   });
+
+  // Deviation list
+  text += `⚠️ *Deviation Manual:*\n`;
+  for(let i=1;i<=deviationCount;i++){
+    const id="dev"+i;
+    const note = document.getElementById(`note_${id}`);
+    if(note && note.value.trim()!==""){
+      text += `• ${note.value.trim()}\n`;
+    }
+  }
+
   return text;
 }
 
@@ -290,6 +325,5 @@ function sendToWhatsApp(){
   window.open(`https://wa.me/?text=${msg}`,'_blank');
 }
 </script>
-
 </body>
 </html>
