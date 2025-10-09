@@ -1,321 +1,210 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QA Inspection HD785-7</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Inspection QA - HD785</title>
 <style>
-body {
-  font-family: "Poppins", sans-serif;
-  margin: 0;
-  background: linear-gradient(to bottom right, #d8e9a8, #9cdba6);
-  color: #222;
-}
-header {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  background: linear-gradient(to right, #f1d28a, #f5e4a2);
-  color: #1a1a1a;
-  text-align: center;
-  padding: 10px 0;
-  font-weight: bold;
-  font-size: 18px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  z-index: 100;
-}
-.fixed-header {
-  position: fixed;
-  top: 60px;
-  left: 0;
-  width: 100%;
-  background: #d8e9a8;
-  z-index: 99;
-  padding: 8px 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-}
-.fixed-header .card {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  padding: 10px;
-  margin-bottom: 8px;
-}
-.container {
-  padding: 10px;
-  max-width: 600px;
-  margin: auto;
-  margin-top: 330px;
-}
-.card {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  padding: 10px;
-  margin-bottom: 10px;
-}
-.label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 4px 0;
-}
-.label span { flex: 1; font-size: 14px; }
-.label button {
-  margin-left: 5px;
-  padding: 4px 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-.ok { background: #a4f5a4; }
-.ok.active { background: #4caf50; color:white; }
-.notok { background: #f5a4a4; }
-.notok.active { background: #f44336; color:white; }
-textarea, input, select {
-  width: 100%;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  resize: none;
-  margin-top: 4px;
-  padding: 5px;
-  font-size: 13px;
-}
-input[type="file"] {
-  margin-top: 5px;
-}
-img.preview {
-  display: block;
-  width: 100%;
-  max-height: 150px;
-  object-fit: cover;
-  margin-top: 5px;
-  border-radius: 8px;
-}
-.progress-container {
-  width: 100%;
-  background: #ddd;
-  border-radius: 6px;
-  margin-top: 5px;
-  display: none;
-}
-.progress-bar {
-  height: 8px;
-  width: 0%;
-  background: #4caf50;
-  border-radius: 6px;
-  transition: width 0.3s;
-}
-button.main {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  background: #f1d28a;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-.buttons {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 10px;
-}
-#uploadStatus {
-  text-align: center;
-  font-weight: bold;
-  margin-top: 10px;
-}
+  :root{
+    --bg1:#f0f6ff; --bg2:#e8fff4; --card:#ffffff;
+    --accent:#2c8c6a; --muted:#666;
+  }
+  body{
+    margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    background: linear-gradient(135deg,var(--bg1),var(--bg2));
+    padding:18px;
+  }
+  .card{
+    background:var(--card);
+    border-radius:14px;
+    box-shadow: 0 8px 24px rgba(30,60,80,0.12);
+    padding:18px; max-width:980px; margin:0 auto 18px;
+  }
+  h1{margin:0 0 8px; font-size:20px; color:var(--accent); text-align:center}
+  label{display:block; font-weight:700; color:#234; margin-top:10px}
+  input[type=text], input[type=date], textarea, select{
+    width:100%; padding:10px; border-radius:8px; border:1px solid #d2d8dd; box-sizing:border-box;
+    margin-top:6px; background:#fff;
+  }
+  textarea{min-height:80px; resize:vertical}
+  .grid{
+    display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:8px;
+  }
+  .checkbox-item{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; padding:8px 10px; border-radius:8px; background:linear-gradient(180deg,#fff,#fbfbfb);
+    border:1px solid #e6e6e6; box-shadow: 0 3px 8px rgba(20,30,40,0.04);
+  }
+  .checkbox-item label{margin:0; font-weight:600; color:#1f2b2a}
+  .checkbox-item input[type=checkbox]{transform:scale(1.18)}
+  .inline-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .inline-row input[type=text]{flex:1; min-width:90px}
+  .actions{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap}
+  .btn{padding:12px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:800}
+  .btn-preview{background:#f6c84c;color:#082; box-shadow:0 4px 10px rgba(246,200,76,0.18)}
+  .btn-wa{background:#25d366;color:#fff}
+  .btn-copy{background:#3498db;color:#fff}
+  .output{white-space:pre-wrap; font-family:Menlo,monospace; background:#0f1720; color:#f8fafc; padding:14px; border-radius:10px; margin-top:14px; min-height:120px}
+  .small{font-size:13px; color:var(--muted)}
+  .preview-images {display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;}
+  .preview-images img{width:100px; height:100px; object-fit:cover; border-radius:8px; border:1px solid #ccc}
+  @media (max-width:520px){
+    .inline-row{flex-direction:column; align-items:stretch}
+  }
 </style>
 </head>
 <body>
 
-<header>🌿 QA Inspection Komatsu HD785-7</header>
+<div class="card">
+  <h1>Inspection Report — HD Series</h1>
 
-<!-- INPUT FIXED -->
-<div class="fixed-header">
-  <div class="card">
-    <label>📋 Jenis QA:
-      <select id="qaType">
-        <option value="QA1">QA-1 (Pre Inspection)</option>
-        <option value="QA7">QA-7 (Final Inspection)</option>
-      </select>
-    </label>
-    <label>📅 Tanggal:</label><input type="date" id="tgl">
-    <label>👷 Mekanik:</label><input type="text" id="mekanik">
-    <label>🚗 CN Unit:</label><input type="text" id="cn">
-    <label>⌛ HM:</label><input type="number" id="hm">
-    <label>📞 Kirim ke No. WhatsApp (tanpa + atau 0):</label>
-    <input type="number" id="waNumber" placeholder="62xxxxxx">
-    <label>📷 Foto Umum Unit:</label><input type="file" id="fotoUnit" accept="image/*" onchange="previewImage(this,'previewUnit')">
-    <img id="previewUnit" class="preview" style="display:none;">
+  <!-- Bagian form tetap sama sampai bagian Deviation -->
+  <!-- ... (semua form input tetap sama seperti versi kamu) ... -->
+
+  <label style="margin-top:12px">*Deviation* (masukkan tiap baris baru untuk tiap temuan)</label>
+  <textarea id="deviation" placeholder="contoh: canopy atas cabin crack 200mm&#10;gasket coupling oil cooler transmission leak"></textarea>
+
+  <!-- 🔽 Tambahan: Upload foto deviasi -->
+  <label>📸 Foto Deviasi (bisa lebih dari satu)</label>
+  <input type="file" id="deviationImages" accept="image/*" multiple>
+  <div id="previewContainer" class="preview-images"></div>
+
+  <div class="actions">
+    <button class="btn btn-preview" onclick="previewText()">🔎 Preview</button>
+    <button class="btn btn-wa" onclick="sendWA()">📤 Send to WhatsApp</button>
+    <button class="btn btn-copy" onclick="copyText()">📋 Copy</button>
+  </div>
+
+  <div class="output" id="output">Preview akan muncul di sini — klik Preview.</div>
+  <div class="small" style="margin-top:8px">
+    Catatan: "Send to WhatsApp" membuka WhatsApp dengan teks sudah terisi; tekan Send di aplikasi WhatsApp untuk kirim.
   </div>
 </div>
 
-<!-- ISI -->
-<div class="container" id="mainContent">
-  <div id="sections"></div>
-  <div class="card">
-    <h3>⚠️ Deviation Tambahan</h3>
-    <textarea id="manualDeviation" rows="3" placeholder="Tambahkan deviation manual..."></textarea>
-    <label>📸 Foto Deviation:</label>
-    <input type="file" id="deviationImage" accept="image/*" onchange="previewImage(this,'previewDeviation')">
-    <img id="previewDeviation" class="preview" style="display:none;">
-  </div>
+<script>
+  // default date = today
+  (function(){ const d=new Date(); document.getElementById('tanggal').value=d.toISOString().split('T')[0]; })();
 
-  <div class="buttons">
-    <button class="main" onclick="sendToWhatsApp()">📤 Send WhatsApp</button>
-  </div>
+  // tyre radio show/hide
+  tyreGood.onchange=()=>tyreFindDiv.style.display='none';
+  tyreBad.onchange=()=>tyreFindDiv.style.display='block';
 
-  <div id="uploadStatus"></div>
-  <div class="progress-container">
-    <div class="progress-bar" id="progressBar"></div>
-  </div>
-</div>
+  function getCheck(id){return document.getElementById(id)?.checked?'✅':'❌';}
 
-<!-- Firebase SDK -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
+  function formatDeviationLines(raw){
+    if(!raw)return'None';
+    const lines=raw.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
+    if(!lines.length)return'None';
+    return lines.map(l=>'⚠️ '+l).join('\\n');
+  }
 
-// 🔧 Ganti konfigurasi Firebase kamu di bawah ini
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+  // 🔽 Preview gambar deviasi
+  const inputImg=document.getElementById('deviationImages');
+  const preview=document.getElementById('previewContainer');
+  let selectedImages=[];
 
-const app = initializeApp(firebaseConfig);
-const storage = getStorage(app);
-
-// === Render bagian inspeksi ===
-const inspectionSections = [
-  { name: "Engine Area", items: ["Belt tension","Oil leakage"] },
-  { name: "Cabin Area", items: ["Power window","FM Radio"] }
-];
-
-function renderSections(){
-  let html="";
-  inspectionSections.forEach(sec=>{
-    html += `<div class="card"><h3>${sec.name}</h3>`;
-    sec.items.forEach((item,idx)=>{
-      const id = sec.name.replace(/\s+/g,'')+idx;
-      html += `
-      <div class="label">
-        <span>${item}</span>
-        <div>
-          <button class="ok active" onclick="toggleButton(this,'OK','${id}')">OK</button>
-          <button class="notok" onclick="toggleButton(this,'Not OK','${id}')">Not OK</button>
-        </div>
-      </div>
-      <textarea id="note_${id}" placeholder="Catatan temuan..."></textarea>
-      <input type="file" id="img_${id}" accept="image/*" onchange="previewImage(this,'prev_${id}')">
-      <img id="prev_${id}" class="preview" style="display:none;">
-      `;
+  inputImg.addEventListener('change',()=>{
+    preview.innerHTML='';
+    selectedImages=Array.from(inputImg.files);
+    selectedImages.forEach(file=>{
+      const img=document.createElement('img');
+      img.src=URL.createObjectURL(file);
+      preview.appendChild(img);
     });
-    html += `</div>`;
   });
-  document.getElementById("sections").innerHTML = html;
-}
-renderSections();
 
-// === Tombol OK/Not OK ===
-window.toggleButton=function(el,val,id){
-  const parent = el.parentElement;
-  parent.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
-  el.classList.add("active");
-};
+  function generateText(){
+    const qa=qaType.value, date=tanggal.value, mekanik=mekanik.value||'-';
+    const cn=cn.value||'-', hm=hm.value||'-';
+    const engineOil=getCheck('engineOil'), transOil=getCheck('transOil'), hydOil=getCheck('hydOil');
+    const belt=getCheck('belt'), oilLeak=getCheck('oilLeak'), crc=getCheck('crc'), injector=getCheck('injector');
+    const radio=getCheck('radio'), fatigue=getCheck('fatigue'), pw=getCheck('pw');
+    const power=powerSupply.value||'-', crp=crp.value||'-';
+    const seat=getCheck('seat'), rail=getCheck('rail');
+    const fl=fl.value||'-', fr=fr.value||'-', rl=rl.value||'-', rr=rr.value||'-';
+    const tyre=document.querySelector('input[name="tyre"]:checked')?.value||'Good';
+    const tyreFinding=tyreFinding.value||'';
+    const jobCard=getCheck('jobCard'), redo=getCheck('redo'), qaForm=getCheck('qaForm');
+    const ppm=getCheck('ppm'), a=getCheck('a'), b=getCheck('b'), c=getCheck('c');
+    const backlog=getCheck('backlog'), fui=getCheck('fui'), ro=getCheck('ro');
+    const combine=getCheck('combine'), sar=getCheck('sar');
+    const deviationRaw=deviation.value, deviation=formatDeviationLines(deviationRaw);
+    const suspensionLine=`FL : ${fl}   FR : ${fr}   RL : ${rl}   RR : ${rr}`;
 
-// === Preview gambar ===
-window.previewImage=function(input, previewId){
-  const img = document.getElementById(previewId);
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = e => { img.src = e.target.result; img.style.display = "block"; };
-    reader.readAsDataURL(input.files[0]);
-  } else { img.style.display = "none"; }
-};
+    // 🔽 Tambahan: jumlah foto deviasi
+    const imgCount=selectedImages.length;
+    const imgInfo=imgCount>0?`📷 ${imgCount} foto deviasi terlampir (tidak terkirim via WA, hanya lokal preview).`:'Tidak ada foto deviasi.';
 
-// === Upload progress ke Firebase ===
-async function uploadImage(file, path){
-  return new Promise((resolve, reject)=>{
-    if(!file) return resolve(null);
-    const storageRef = ref(storage, path);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-    document.querySelector(".progress-container").style.display = "block";
-    uploadTask.on("state_changed",
-      (snapshot)=>{
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        document.getElementById("progressBar").style.width = progress + "%";
-        document.getElementById("uploadStatus").textContent = `Mengunggah... ${Math.round(progress)}%`;
-      },
-      (error)=>{
-        document.getElementById("uploadStatus").textContent = "❌ Upload gagal!";
-        reject(error);
-      },
-      ()=>{
-        getDownloadURL(uploadTask.snapshot.ref).then((url)=>{
-          document.getElementById("uploadStatus").textContent = "✅ Upload selesai!";
-          resolve(url);
-        });
-      }
-    );
-  });
-}
+    const text=
+`*${qa}*
 
-// === Kirim ke WhatsApp ===
-window.sendToWhatsApp = async function(){
-  const qaType = document.getElementById("qaType").value;
-  const tgl = document.getElementById("tgl").value;
-  const mekanik = document.getElementById("mekanik").value;
-  const cn = document.getElementById("cn").value;
-  const hm = document.getElementById("hm").value;
-  const waNumber = document.getElementById("waNumber").value.trim();
+📅 Tgl : ${date}
+👷 Mekanik : ${mekanik}
 
-  if (!waNumber) { alert("Masukkan nomor WhatsApp tujuan!"); return; }
+🚗 CN : ${cn}
+⌛ HM : ${hm}
 
-  let msg = `*${qaType === "QA1" ? "QA-1 Pre Inspection" : "QA-7 Final Inspection"}*\n\n`;
-  msg += `📅 Tanggal: ${tgl}\n👷 Mekanik: ${mekanik}\n🚗 CN Unit: ${cn}\n⌛ HM: ${hm}\n\n`;
+🩸 *Oil Level* 🩸
+Engine oil level : ${engineOil}
+Transmission oil level : ${transOil}
+Hydraulic oil level : ${hydOil}
 
-  const fotoUnit = document.getElementById("fotoUnit").files[0];
-  if(fotoUnit){
-    const url = await uploadImage(fotoUnit, `unit/${cn}_${Date.now()}`);
-    if(url) msg += `📸 Foto Unit: ${url}\n\n`;
+⚙ *Engine Area* ⚙
+Belt tension : ${belt}
+Engine oil leakage : ${oilLeak}
+Common Rail Connector : ${crc}
+Injector Tube : ${injector}
+
+🚗 *Cabin Area* 🚗
+FM Radio : ${radio}
+Fatigue Warning : ${fatigue}
+Power Window : ${pw}
+⚡ Power Supply : ${power}
+💧 Common Rail Pressure (ON) : ${crp}
+
+🚗 *Frame Area* 🚗
+Operator seat : ${seat}
+Hand Rail : ${rail}
+
+💧 *Pressure Suspension (Panel)* 💧
+${suspensionLine}
+
+🛞 *Tyre condition :*
+Tyre : ${tyre}${tyre==='Bad' && tyreFinding?' - '+tyreFinding:''}
+
+📝 Validasi & Kelengkapan Service :
+- Job Card & Cover Checklist ${jobCard}
+- Form Observasi Redo PS ${redo}
+- Form QA 1 & QA 7 ${qaForm}
+- Form PPM ${ppm}
+- Form Check List A ${a}
+- Form Check List B ${b}
+- Form Check List C ${c}
+- Form Backlog ${backlog}
+- Form FUI ${fui}
+- Form Repair Order ${ro}
+- Form Combine Maintenance ${combine}
+- Form Service Activity Report ${sar}
+
+*Deviation :*
+${deviation}
+
+${imgInfo}`;
+
+    return text;
   }
 
-  for(const sec of inspectionSections){
-    msg += `🧩 *${sec.name}*\n`;
-    for(const [idx, item] of sec.items.entries()){
-      const id = sec.name.replace(/\s+/g,'')+idx;
-      const note = document.getElementById(`note_${id}`).value.trim();
-      const notOk = document.querySelector(`#img_${id}`).previousElementSibling.previousElementSibling.querySelector(".notok.active");
-      msg += `${item}: ${notOk ? "❌ Not OK" : "✅ OK"}\n`;
-      if(note) msg += `📝 ${note}\n`;
-      const file = document.getElementById(`img_${id}`).files[0];
-      if(file){
-        const url = await uploadImage(file, `temuan/${cn}_${id}_${Date.now()}`);
-        if(url) msg += `📷 ${url}\n`;
-      }
-    }
-    msg += `\n`;
+  function previewText(){
+    output.innerText=generateText();
+    output.scrollIntoView({behavior:'smooth'});
   }
-
-  const devText = document.getElementById("manualDeviation").value.trim();
-  const devImg = document.getElementById("deviationImage").files[0];
-  if(devText || devImg){
-    msg += `⚠️ *Deviation:*\n${devText || "Tidak ada"}\n`;
-    if(devImg){
-      const url = await uploadImage(devImg, `deviation/${cn}_${Date.now()}`);
-      if(url) msg += `📸 ${url}\n`;
-    }
+  function sendWA(){
+    window.open('https://wa.me/?text='+encodeURIComponent(generateText()),'_blank');
   }
-
-  const waMsg = encodeURIComponent(msg);
-  window.open(`https://wa.me/${waNumber}?text=${waMsg}`, "_blank");
-}
+  function copyText(){
+    navigator.clipboard.writeText(generateText()).then(()=>alert('✅ Teks berhasil disalin.'));
+  }
 </script>
+
 </body>
 </html>
