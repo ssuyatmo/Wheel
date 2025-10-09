@@ -85,6 +85,28 @@ textarea, input, select {
 input[type="file"] {
   margin-top: 5px;
 }
+img.preview {
+  display: block;
+  width: 100%;
+  max-height: 150px;
+  object-fit: cover;
+  margin-top: 5px;
+  border-radius: 8px;
+}
+.progress-container {
+  width: 100%;
+  background: #ddd;
+  border-radius: 6px;
+  margin-top: 5px;
+  display: none;
+}
+.progress-bar {
+  height: 8px;
+  width: 0%;
+  background: #4caf50;
+  border-radius: 6px;
+  transition: width 0.3s;
+}
 button.main {
   padding: 8px 14px;
   border: none;
@@ -97,6 +119,11 @@ button.main {
 .buttons {
   display: flex;
   justify-content: space-around;
+  margin-top: 10px;
+}
+#uploadStatus {
+  text-align: center;
+  font-weight: bold;
   margin-top: 10px;
 }
 </style>
@@ -118,7 +145,8 @@ button.main {
     <label>👷 Mekanik:</label><input type="text" id="mekanik">
     <label>🚗 CN Unit:</label><input type="text" id="cn">
     <label>⌛ HM:</label><input type="number" id="hm">
-    <label>📷 Foto Umum Unit:</label><input type="file" id="fotoUnit" accept="image/*">
+    <label>📷 Foto Umum Unit:</label><input type="file" id="fotoUnit" accept="image/*" onchange="previewImage(this,'previewUnit')">
+    <img id="previewUnit" class="preview" style="display:none;">
   </div>
 </div>
 
@@ -129,20 +157,26 @@ button.main {
     <h3>⚠️ Deviation Tambahan</h3>
     <textarea id="manualDeviation" rows="3" placeholder="Tambahkan deviation manual..."></textarea>
     <label>📸 Foto Deviation:</label>
-    <input type="file" id="deviationImage" accept="image/*">
+    <input type="file" id="deviationImage" accept="image/*" onchange="previewImage(this,'previewDeviation')">
+    <img id="previewDeviation" class="preview" style="display:none;">
   </div>
 
   <div class="buttons">
-    <button class="main" onclick="sendToWhatsApp()">📤 Kirim ke WhatsApp</button>
+    <button class="main" onclick="sendToWhatsApp()">📤 Send WhatsApp</button>
+  </div>
+
+  <div id="uploadStatus"></div>
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
   </div>
 </div>
 
 <!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
-// 🔧 Ganti konfigurasi ini dengan milikmu sendiri dari Firebase Console
+// 🔧 Ganti konfigurasi Firebase kamu di bawah ini
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -151,14 +185,11 @@ const firebaseConfig = {
   messagingSenderId: "YOUR_SENDER_ID",
   appId: "YOUR_APP_ID"
 };
+
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
-const sectionsData = {
-  QA1: { title: "Validasi Checklist Service", items: ["Job Card","Form QA 1","Form PPM"] },
-  QA7: { title: "Kelengkapan Checklist Service", items: ["Job Card","Form QA 7","Form Repair Order"] }
-};
-
+// === Render bagian inspeksi ===
 const inspectionSections = [
   { name: "Engine Area", items: ["Belt tension","Oil leakage"] },
   { name: "Cabin Area", items: ["Power window","FM Radio"] }
@@ -179,52 +210,84 @@ function renderSections(){
         </div>
       </div>
       <textarea id="note_${id}" placeholder="Catatan temuan..."></textarea>
-      <input type="file" id="img_${id}" accept="image/*">
+      <input type="file" id="img_${id}" accept="image/*" onchange="previewImage(this,'prev_${id}')">
+      <img id="prev_${id}" class="preview" style="display:none;">
       `;
     });
     html += `</div>`;
   });
   document.getElementById("sections").innerHTML = html;
 }
+renderSections();
+
+// === Tombol OK/Not OK ===
 window.toggleButton=function(el,val,id){
   const parent = el.parentElement;
   parent.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
   el.classList.add("active");
-}
-renderSections();
+};
 
+// === Preview gambar ===
+window.previewImage=function(input, previewId){
+  const img = document.getElementById(previewId);
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => { img.src = e.target.result; img.style.display = "block"; };
+    reader.readAsDataURL(input.files[0]);
+  } else { img.style.display = "none"; }
+};
+
+// === Upload progress ke Firebase ===
 async function uploadImage(file, path){
-  if(!file) return null;
-  const imageRef = ref(storage, path);
-  await uploadBytes(imageRef, file);
-  return await getDownloadURL(imageRef);
+  return new Promise((resolve, reject)=>{
+    if(!file) return resolve(null);
+    const storageRef = ref(storage, path);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+    document.querySelector(".progress-container").style.display = "block";
+    uploadTask.on("state_changed",
+      (snapshot)=>{
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        document.getElementById("progressBar").style.width = progress + "%";
+        document.getElementById("uploadStatus").textContent = `Mengunggah... ${Math.round(progress)}%`;
+      },
+      (error)=>{
+        document.getElementById("uploadStatus").textContent = "❌ Upload gagal!";
+        reject(error);
+      },
+      ()=>{
+        getDownloadURL(uploadTask.snapshot.ref).then((url)=>{
+          document.getElementById("uploadStatus").textContent = "✅ Upload selesai!";
+          resolve(url);
+        });
+      }
+    );
+  });
 }
 
+// === Kirim ke WhatsApp ===
 window.sendToWhatsApp = async function(){
   const qaType = document.getElementById("qaType").value;
   const tgl = document.getElementById("tgl").value;
   const mekanik = document.getElementById("mekanik").value;
   const cn = document.getElementById("cn").value;
   const hm = document.getElementById("hm").value;
-  
+
   let msg = `*${qaType === "QA1" ? "QA-1 Pre Inspection" : "QA-7 Final Inspection"}*\n\n`;
   msg += `📅 Tanggal: ${tgl}\n👷 Mekanik: ${mekanik}\n🚗 CN Unit: ${cn}\n⌛ HM: ${hm}\n\n`;
 
-  // Upload foto unit
   const fotoUnit = document.getElementById("fotoUnit").files[0];
   if(fotoUnit){
     const url = await uploadImage(fotoUnit, `unit/${cn}_${Date.now()}`);
     if(url) msg += `📸 Foto Unit: ${url}\n\n`;
   }
 
-  // Bagian inspeksi
   for(const sec of inspectionSections){
     msg += `🧩 *${sec.name}*\n`;
     for(const [idx, item] of sec.items.entries()){
       const id = sec.name.replace(/\s+/g,'')+idx;
       const note = document.getElementById(`note_${id}`).value.trim();
-      const isNotOk = document.querySelector(`#img_${id}`).previousElementSibling.previousElementSibling.querySelector(".notok.active");
-      msg += `${item}: ${isNotOk ? "❌ Not OK" : "✅ OK"}\n`;
+      const notOk = document.querySelector(`#img_${id}`).previousElementSibling.previousElementSibling.querySelector(".notok.active");
+      msg += `${item}: ${notOk ? "❌ Not OK" : "✅ OK"}\n`;
       if(note) msg += `📝 ${note}\n`;
       const file = document.getElementById(`img_${id}`).files[0];
       if(file){
@@ -235,7 +298,6 @@ window.sendToWhatsApp = async function(){
     msg += `\n`;
   }
 
-  // Deviation
   const devText = document.getElementById("manualDeviation").value.trim();
   const devImg = document.getElementById("deviationImage").files[0];
   if(devText || devImg){
