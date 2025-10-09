@@ -45,7 +45,7 @@ header {
   padding: 10px;
   max-width: 600px;
   margin: auto;
-  margin-top: 280px;
+  margin-top: 330px;
 }
 .card {
   background: #fff;
@@ -145,6 +145,8 @@ button.main {
     <label>👷 Mekanik:</label><input type="text" id="mekanik">
     <label>🚗 CN Unit:</label><input type="text" id="cn">
     <label>⌛ HM:</label><input type="number" id="hm">
+    <label>📞 Kirim ke No. WhatsApp (tanpa + atau 0):</label>
+    <input type="number" id="waNumber" placeholder="62xxxxxx">
     <label>📷 Foto Umum Unit:</label><input type="file" id="fotoUnit" accept="image/*" onchange="previewImage(this,'previewUnit')">
     <img id="previewUnit" class="preview" style="display:none;">
   </div>
@@ -271,6 +273,9 @@ window.sendToWhatsApp = async function(){
   const mekanik = document.getElementById("mekanik").value;
   const cn = document.getElementById("cn").value;
   const hm = document.getElementById("hm").value;
+  const waNumber = document.getElementById("waNumber").value.trim();
+
+  if (!waNumber) { alert("Masukkan nomor WhatsApp tujuan!"); return; }
 
   let msg = `*${qaType === "QA1" ? "QA-1 Pre Inspection" : "QA-7 Final Inspection"}*\n\n`;
   msg += `📅 Tanggal: ${tgl}\n👷 Mekanik: ${mekanik}\n🚗 CN Unit: ${cn}\n⌛ HM: ${hm}\n\n`;
@@ -309,7 +314,7 @@ window.sendToWhatsApp = async function(){
   }
 
   const waMsg = encodeURIComponent(msg);
-  window.open(`https://wa.me/?text=${waMsg}`, "_blank");
+  window.open(`https://wa.me/${waNumber}?text=${waMsg}`, "_blank");
 }
 </script>
 </body>
