@@ -3,157 +3,378 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Camera / Upload OCR & WhatsApp</title>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
+<title>QA Inspection HD785-7</title>
 <style>
-body{font-family:Arial;margin:10px;background:#f9f9f9;color:#222;}
-video,img{width:100%;border-radius:8px;max-height:50vh;object-fit:cover;}
-textarea{width:100%;height:120px;margin-top:8px;border-radius:8px;border:1px solid #ddd;padding:8px;}
-button,input,select{padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ccc;width:100%;}
-#progressContainer{width:100%;background:#eee;border-radius:8px;overflow:hidden;height:18px;display:none;margin-top:8px;}
-#progressBar{width:0%;height:100%;background:#4caf50;color:#fff;text-align:center;font-size:12px;line-height:18px;}
+body {
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  background: linear-gradient(to bottom right, #d8e9a8, #9cdba6);
+  color: #222;
+}
+
+/* === HEADER UTAMA === */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(to right, #f1d28a, #f5e4a2);
+  color: #1a1a1a;
+  text-align: center;
+  padding: 10px 0;
+  font-weight: bold;
+  font-size: 18px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 100;
+}
+
+/* === FORM INPUT DI BAWAH HEADER (FIXED) === */
+.fixed-header {
+  position: fixed;
+  top: 60px; /* jarak di bawah header 🌿 */
+  left: 0;
+  width: 100%;
+  background: #d8e9a8;
+  z-index: 99;
+  padding: 8px 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.fixed-header .card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+.fixed-header label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+/* === KONTEN SCROLL === */
+.container {
+  padding: 10px;
+  max-width: 600px;
+  margin: auto;
+  margin-top: 250px; /* memberi jarak agar tidak tertutup oleh bagian fixed */
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  padding: 10px;
+  margin-bottom: 10px;
+  transition: background 0.3s;
+}
+
+h3 {
+  background: #cfe8cf;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px 0;
+}
+
+.label span { flex: 1; font-size: 14px; }
+.label button {
+  margin-left: 5px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.ok { background: #a4f5a4; }
+.ok.active { background: #4caf50; color:white; }
+.notok { background: #f5a4a4; }
+.notok.active { background: #f44336; color:white; }
+
+textarea, input[type="text"], input[type="number"], input[type="date"], select {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: none;
+  margin-top: 4px;
+  padding: 5px;
+  font-size: 13px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+button.main {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #f1d28a;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* === POPUP PREVIEW === */
+#previewPopup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  width: 90%;
+  max-width: 400px;
+  z-index: 200;
+  padding: 15px;
+}
+#previewPopup pre {
+  max-height: 60vh;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+#popupButtons {
+  display: flex;
+  justify-content: space-around;
+}
+
+/* === RESPONSIVE UNTUK HP === */
+@media (max-width: 480px) {
+  header {
+    font-size: 16px;
+    padding: 8px 0;
+  }
+  .fixed-header {
+    top: 50px;
+    padding: 6px;
+  }
+  .container {
+    margin-top: 230px;
+    padding: 8px;
+  }
+  .fixed-header .card {
+    padding: 8px;
+  }
+  input, select, textarea {
+    font-size: 12px;
+  }
+}
 </style>
 </head>
 <body>
 
-<h2>Camera / Upload OCR & WhatsApp</h2>
+<header>🌿 QA Inspection Komatsu HD785-7</header>
 
-<!-- Pilih sumber foto -->
-<select id="photoSource">
-  <option value="camera">📷 Kamera</option>
-  <option value="upload">🖼️ Upload Foto</option>
-</select>
+<!-- BAGIAN INPUT FIXED -->
+<div class="fixed-header">
+  <div class="card">
+    <label>Pilih Jenis QA:
+      <select id="qaType">
+        <option value="QA1">QA-1 (Pre Inspection)</option>
+        <option value="QA7">QA-7 (Final Inspection)</option>
+      </select>
+    </label>
+  </div>
 
-<!-- Kamera -->
-<video id="video" autoplay playsinline style="display:block;"></video>
-<input type="file" id="uploadPhoto" accept="image/*" style="display:none">
+  <div class="card">
+    <label>📅 Tanggal:</label><input type="date" id="tgl">
+    <label>👷 Mekanik:</label><input type="text" id="mekanik">
+    <label>🚗 CN Unit:</label><input type="text" id="cn">
+    <label>⌛ HM:</label><input type="number" id="hm">
+  </div>
+</div>
 
-<button id="capture">Ambil Foto & OCR</button>
-<img id="photoPreview" alt="Preview" style="display:none"/>
-<div id="progressContainer"><div id="progressBar">0%</div></div>
-<textarea id="ocrResult" placeholder="Hasil OCR akan muncul disini..."></textarea>
-<input type="text" id="ocrLang" value="eng" placeholder="Bahasa OCR (eng/ind/jpn)">
-<button id="sendWA" style="background:#25D366;color:white;">💬 Kirim ke WhatsApp</button>
+<!-- ISI UTAMA YANG BISA DISCROLL -->
+<div class="container" id="mainContent">
+  <div id="sections"></div>
+
+  <div class="buttons">
+    <button class="main" onclick="showPreview()">🧾 Preview</button>
+    <button class="main" onclick="sendToWhatsApp()">📤 Send WA</button>
+  </div>
+</div>
+
+<!-- POPUP PREVIEW -->
+<div id="previewPopup">
+  <pre id="previewText"></pre>
+  <div id="popupButtons">
+    <button onclick="copyText()">📋 Copy</button>
+    <button onclick="sendToWhatsApp()">📤 Send WA</button>
+    <button onclick="closePopup()">❌ Close</button>
+  </div>
+</div>
 
 <script>
-// Firebase Config
-const firebaseConfig = {
-  apiKey: "API_KEY",
-  authDomain: "PROJECT_ID.firebaseapp.com",
-  projectId: "PROJECT_ID",
-  storageBucket: "PROJECT_ID.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID"
+/* === JAVASCRIPT SAMA SEPERTI SEBELUMNYA === */
+const sectionsData = {
+  QA1: { title: "Validasi & Kelengkapan Checklist Service", items: [
+      "Job Card & Cover Checklist","Form Observasi Redo PS","Form QA 1 & QA 7","Form PPM",
+      "Form Check List A","Form Check List B","Form Check List C","Form Backlog",
+      "Form FUI","Form Repair Order","Form Combine Maintenance","Form Service Activity Report"
+  ]},
+  QA7: { title: "Kelengkapan Pengisian Checklist Service", items: [
+      "Job Card & Cover Checklist","Form Observasi Redo PS","Form QA 1 & QA 7","Form PPM",
+      "Form Check List A","Form Check List B","Form Check List C","Form Backlog",
+      "Form FUI","Form Repair Order","Form Combine Maintenance","Form Service Activity Report"
+  ]}
 };
-firebase.initializeApp(firebaseConfig);
-firebase.auth().signInAnonymously().catch(console.error);
-const storage = firebase.storage();
 
-const video = document.getElementById('video');
-const uploadPhoto = document.getElementById('uploadPhoto');
-const canvas = document.createElement('canvas');
-const photoPreview = document.getElementById('photoPreview');
-const ocrResult = document.getElementById('ocrResult');
-const progressContainer = document.getElementById('progressContainer');
-const progressBar = document.getElementById('progressBar');
-const ocrLangInput = document.getElementById('ocrLang');
-const captureBtn = document.getElementById('capture');
-const sendWA = document.getElementById('sendWA');
-const photoSource = document.getElementById('photoSource');
+const inspectionSections = [
+  { name: "Oil Level", items: ["Engine oil level","Transmission oil level","Hydraulic oil level"] },
+  { name: "Engine Area", items: [
+    "Belt tension","Engine oil leakage","Common Rail Connector","Injector Tube",
+    {label:"Common rail pressure (ON)", type:"number", unit:"MPa"},
+    {label:"Power Supply (ON)", type:"number", unit:"V"}
+  ]},
+  { name: "Cabin Area", items: ["FM Radio","Fatigue Warning","Power Window"] },
+  { name: "Frame Area", items: ["Operator seat","Hand Rail"] },
+  { name: "Suspension Pressure (on monitor panel)", items: [
+    {label:"FL", type:"number", unit:"MPa"},
+    {label:"FR", type:"number", unit:"MPa"},
+    {label:"RL", type:"number", unit:"MPa"},
+    {label:"RR", type:"number", unit:"MPa"}
+  ]},
+  { name: "Tyre Condition", items: ["Tyre Condition"] }
+];
 
-let stream = null;
+function renderSections(){
+  const qaType = document.getElementById('qaType').value;
+  let html = "";
 
-// Fungsi start kamera
-async function startCamera(){
-  if(stream) stream.getTracks().forEach(t=>t.stop());
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}, audio:false});
-    video.srcObject = stream;
-  }catch(err){alert('Kamera error: '+err.message);}
-}
-
-// Tampilkan sesuai pilihan
-photoSource.addEventListener('change', ()=>{
-  if(photoSource.value==='camera'){
-    video.style.display='block';
-    uploadPhoto.style.display='none';
-    startCamera();
-  } else {
-    video.style.display='none';
-    uploadPhoto.style.display='block';
-    if(stream) stream.getTracks().forEach(t=>t.stop());
-  }
-});
-
-// Ambil foto dari kamera
-captureBtn.addEventListener('click', async ()=>{
-  if(photoSource.value==='camera'){
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video,0,0);
-    const dataUrl = canvas.toDataURL('image/png');
-    photoPreview.src = dataUrl;
-    photoPreview.style.display='block';
-    await uploadAndOCR(dataUrl);
-  } else if(photoSource.value==='upload'){
-    if(uploadPhoto.files.length===0){ alert('Pilih foto untuk upload'); return; }
-    const file = uploadPhoto.files[0];
-    const reader = new FileReader();
-    reader.onload = async ()=>{
-      const dataUrl = reader.result;
-      photoPreview.src = dataUrl;
-      photoPreview.style.display='block';
-      await uploadAndOCR(dataUrl);
-    };
-    reader.readAsDataURL(file);
-  }
-});
-
-// Upload ke Firebase & OCR
-async function uploadAndOCR(dataUrl){
-  progressContainer.style.display='block';
-  progressBar.style.width='0%';
-  progressBar.innerText='0%';
-  ocrResult.value='Sedang memproses...';
-
-  try{
-    const blob = await (await fetch(dataUrl)).blob();
-    const filename = 'foto_'+Date.now()+'.png';
-    const ref = storage.ref().child(filename);
-    await ref.put(blob);
-
-    const lang = ocrLangInput.value || 'eng';
-    const worker = Tesseract.createWorker({
-      logger:m=>{
-        if(m.status==='recognizing text'||m.status==='loading tesseract core'){
-          const p = Math.round(m.progress*100);
-          progressBar.style.width = p+'%';
-          progressBar.innerText = p+'%';
-        }
+  inspectionSections.forEach(sec=>{
+    html += `<div class="card"><h3>${sec.name}</h3>`;
+    sec.items.forEach((item, idx)=>{
+      const id = sec.name.replace(/\s+/g,'')+idx;
+      if(typeof item === 'object' && item.type === 'number'){
+        html += `<label>${item.label}:<input type="number" id="num_${id}" step="0.1" placeholder="Masukkan nilai (${item.unit})..."></label>`;
+      } else {
+        html += `
+        <div class="label">
+          <span>${item}</span>
+          <div>
+            <button class="ok active" onclick="toggleButton(this,'OK','${id}')">OK</button>
+            <button class="notok" onclick="toggleButton(this,'Not OK','${id}')">Not OK</button>
+          </div>
+        </div>
+        <textarea id="note_${id}" placeholder="Tulis temuan jika ada..."></textarea>`;
       }
     });
-    await worker.load();
-    await worker.loadLanguage(lang);
-    await worker.initialize(lang);
-    const { data:{ text } } = await worker.recognize(blob);
-    ocrResult.value = text;
-    progressBar.style.width='100%';
-    progressBar.innerText='Selesai';
-    await worker.terminate();
-  }catch(e){alert('Error: '+e.message);}
+    html += `</div>`;
+  });
+
+  const validasi = sectionsData[qaType];
+  html += `<div class="card"><h3>${validasi.title}</h3>`;
+  validasi.items.forEach((v,i)=>{
+    const id="val"+i;
+    html += `
+      <div class="label">
+        <span>${v}</span>
+        <div>
+          <button class="ok active" onclick="toggleButton(this,'OK','${id}')">OK</button>
+          <button class="notok" onclick="toggleButton(this,'Not OK','${id}')">Not OK</button>
+        </div>
+      </div>`;
+  });
+  html += `</div><div class="card"><h3>⚠️ Deviation (Tambahkan jika ada)</h3><textarea id="manualDeviation" rows="3" placeholder="Tambahkan deviation manual..."></textarea></div>`;
+  
+  document.getElementById('sections').innerHTML = html;
+  updateCardColors();
+}
+renderSections();
+document.getElementById('qaType').addEventListener('change', renderSections);
+
+function toggleButton(el,val,id){
+  const parent = el.parentElement;
+  parent.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+  el.classList.add('active');
+  el.dataset.value = val;
+  updateCardColors();
 }
 
-// Kirim WA
-sendWA.addEventListener('click', ()=>{
-  const text = encodeURIComponent(ocrResult.value || '');
-  window.open(`https://wa.me/?text=${text}`,'_blank');
-});
+function updateCardColors() {
+  document.querySelectorAll('.card').forEach(card => {
+    const notOkBtn = card.querySelector('.notok.active');
+    if (notOkBtn) {
+      card.style.background = '#f8d7da';
+    } else {
+      card.style.background = '#fff';
+    }
+  });
+}
 
-// Inisialisasi kamera saat pertama kali jika default Camera
-if(photoSource.value==='camera') startCamera();
+function showPreview(){
+  document.getElementById('previewPopup').style.display='block';
+  document.getElementById('previewText').textContent = generateText();
+}
+
+function generateText(){
+  const qaType=document.getElementById('qaType').value;
+  let text=`*${qaType==='QA1'?'QA-1 Pre Inspection':'QA-7 Final Inspection'}*\n\n`;
+  text+=`📅 Tanggal : ${tgl.value}\n👷 Mekanik : ${mekanik.value}\n🚗 CN : ${cn.value}\n⌛ HM : ${hm.value}\n\n---\n`;
+
+  let deviations=[];
+
+  inspectionSections.forEach(sec=>{
+    text+=`🧩 *${sec.name}*\n`;
+    sec.items.forEach((item,idx)=>{
+      const id=sec.name.replace(/\s+/g,'')+idx;
+      if(typeof item==='object' && item.type==='number'){
+        const val=document.getElementById(`num_${id}`).value;
+        text+=`${item.label} : ${val?val+' '+item.unit:'-'}\n`;
+      } else {
+        const ok=document.querySelector(`#note_${id}`).previousElementSibling.querySelector('.ok.active');
+        const notok=document.querySelector(`#note_${id}`).previousElementSibling.querySelector('.notok.active');
+        const status=ok?'✅ OK':notok?'❌ Not OK':'❔';
+        text+=`${item} : ${status}\n`;
+        const note=document.getElementById(`note_${id}`).value.trim();
+        if(note) deviations.push(`⚠️ ${note}`);
+      }
+    });
+    text+=`\n`;
+  });
+
+  const qaSection=sectionsData[qaType];
+  text+=`📝 *${qaSection.title}*\n`;
+  qaSection.items.forEach((v,i)=>{
+    const id="val"+i;
+    const ok=document.querySelector(`[onclick*="${id}"].ok.active`);
+    const notok=document.querySelector(`[onclick*="${id}"].notok.active`);
+    text+=`${v} : ${ok?'✅ OK':notok?'❌ Not OK':'❔'}\n`;
+  });
+
+  const manualDev=document.getElementById('manualDeviation').value.trim();
+  if(manualDev) manualDev.split('\n').forEach(d=>deviations.push(`⚠️ ${d.trim()}`));
+  
+  text+=`\n⚠️ *Deviation:*\n`+(deviations.length?deviations.join('\n'):'Tidak ada')+'\n';
+  return text;
+}
+
+function copyText(){
+  navigator.clipboard.writeText(previewText.textContent);
+  alert('✅ Teks disalin!');
+}
+
+function sendToWhatsApp(){
+  const msg=encodeURIComponent(generateText());
+  window.open(`https://wa.me/?text=${msg}`,'_blank');
+}
+
+function closePopup(){
+  previewPopup.style.display='none';
+}
 </script>
 
 </body>
