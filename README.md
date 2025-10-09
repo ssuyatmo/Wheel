@@ -14,10 +14,8 @@ body {
 header {
   position: fixed; top: 0; left: 0; width: 100%;
   background: linear-gradient(to right, #f1d28a, #f5e4a2);
-  color: #1a1a1a; text-align: center; padding: 10px 0;
-  font-weight: bold; font-size: 18px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  z-index: 100;
+  text-align: center; padding: 10px 0; font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 100;
 }
 .fixed-header {
   position: fixed; top: 60px; left: 0; width: 100%;
@@ -29,20 +27,13 @@ header {
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   padding: 10px; margin-bottom: 8px;
 }
-.container {
-  padding: 10px; max-width: 600px; margin: auto;
-  margin-top: 300px;
-}
+.container { padding: 10px; max-width: 600px; margin: auto; margin-top: 310px; }
 .card {
   background: #fff; border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   padding: 10px; margin-bottom: 10px;
-  transition: background 0.3s;
 }
-h3 {
-  background: #cfe8cf; padding: 6px; border-radius: 6px;
-  font-size: 15px;
-}
+h3 { background: #cfe8cf; padding: 6px; border-radius: 6px; font-size: 15px; }
 .label { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; }
 .label span { flex: 1; font-size: 14px; }
 .label button {
@@ -55,7 +46,7 @@ h3 {
 .notok.active { background: #f44336; color:white; }
 textarea, input[type="text"], input[type="number"], input[type="date"], select {
   width: 100%; border-radius: 6px; border: 1px solid #ccc;
-  resize: none; margin-top: 4px; padding: 5px; font-size: 13px;
+  margin-top: 4px; padding: 5px; font-size: 13px;
 }
 img.preview {
   width: 100px; height: 80px; object-fit: cover;
@@ -67,9 +58,7 @@ button.main {
   font-weight: bold; cursor: pointer;
   background: #f1d28a; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
-
-/* Popup */
-#previewPopup, #editPopup {
+#previewPopup {
   display: none; position: fixed; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   background: white; border-radius: 10px;
@@ -81,24 +70,12 @@ button.main {
   font-size: 13px; margin-bottom: 10px;
 }
 #popupButtons { display: flex; justify-content: space-around; }
-#editPopup textarea {
-  width: 100%; height: 100px; resize: none;
-  border-radius: 6px; border: 1px solid #aaa; padding: 6px;
+.previewImages {
+  display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
 }
-.dev-header {
-  display: flex; justify-content: space-between; align-items: center;
-}
-.delete-btn {
-  background: #ffb3b3; border: none; padding: 4px 8px;
-  border-radius: 5px; cursor: pointer;
-}
-.delete-btn:hover { background: #ff6666; color: white; }
-
-/* Responsive */
-@media (max-width: 480px){
-  header{font-size:16px;padding:8px 0;}
-  .fixed-header{top:50px;padding:6px;}
-  .container{margin-top:250px;padding:8px;}
+.previewImages img {
+  width: 90px; height: 80px; border-radius: 8px; object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 </style>
 </head>
@@ -129,7 +106,6 @@ button.main {
 <div class="container" id="mainContent">
   <div id="sections"></div>
 
-  <!-- Deviation manual -->
   <div class="card" id="deviationSection">
     <h3>⚠️ Deviation (Tambahkan jika ada)</h3>
     <div id="deviationList"></div>
@@ -138,26 +114,17 @@ button.main {
 
   <div class="buttons">
     <button class="main" onclick="showPreview()">🧾 Preview</button>
-    <button class="main" onclick="sendToWhatsApp()">📤 Send WA</button>
+    <button class="main" onclick="sendToWhatsApp()">📤 Kirim ke WhatsApp</button>
   </div>
 </div>
 
-<!-- Popup Preview -->
+<!-- POPUP PREVIEW -->
 <div id="previewPopup">
   <pre id="previewText"></pre>
+  <div class="previewImages" id="allPreviewImages"></div>
   <div id="popupButtons">
     <button onclick="copyText()">📋 Copy</button>
-    <button onclick="sendToWhatsApp()">📤 Send WA</button>
     <button onclick="closePopup()">❌ Close</button>
-  </div>
-</div>
-
-<!-- Popup Edit Temuan -->
-<div id="editPopup">
-  <h3>✏️ Edit Temuan</h3>
-  <textarea id="editTextarea"></textarea>
-  <div class="buttons">
-    <button class="main" onclick="saveEdit()">💾 Simpan</button>
   </div>
 </div>
 
@@ -170,7 +137,6 @@ const inspectionSections = [
   { name: "Tyre Condition", items: ["Tyre Condition"] }
 ];
 
-let currentEditId = null;
 let deviationCount = 0;
 
 function renderSections(){
@@ -187,9 +153,10 @@ function renderSections(){
             <button class="notok" onclick="toggleButton(this,'Not OK','${id}')">Not OK</button>
           </div>
         </div>
-        <textarea id="note_${id}" placeholder="Tulis temuan jika ada..." onclick="openEdit('${id}')"></textarea>
+        <textarea id="note_${id}" placeholder="Tulis temuan jika ada..."></textarea>
         <input type="file" accept="image/*" id="img_${id}" style="display:none" onchange="previewImage('${id}', event)">
-        <img id="preview_${id}" class="preview">`;
+        <img id="preview_${id}" class="preview">
+      `;
     });
     html += `</div>`;
   });
@@ -201,21 +168,16 @@ function toggleButton(el,val,id){
   const parent = el.parentElement;
   parent.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
   el.classList.add('active');
-  el.dataset.value = val;
   const allowImg = document.getElementById('allowImage').checked;
   const imgInput = document.getElementById(`img_${id}`);
   const previewImg = document.getElementById(`preview_${id}`);
-  if(imgInput){
-    if(val === 'Not OK' && allowImg){
-      imgInput.style.display = 'block';
-      previewImg.style.display = previewImg.src ? 'block' : 'none';
-    } else {
-      imgInput.style.display = 'none';
-      previewImg.style.display = 'none';
-    }
+  if(val === 'Not OK' && allowImg){
+    imgInput.style.display = 'block';
+  } else {
+    imgInput.style.display = 'none';
+    previewImg.style.display = 'none';
   }
 }
-
 function previewImage(id, event){
   const file = event.target.files[0];
   if(file){
@@ -229,54 +191,41 @@ function previewImage(id, event){
   }
 }
 
-/* === Popup edit temuan === */
-function openEdit(id){
-  currentEditId = id;
-  const text = document.getElementById(`note_${id}`).value;
-  document.getElementById('editTextarea').value = text;
-  document.getElementById('editPopup').style.display = 'block';
-}
-function saveEdit(){
-  const newText = document.getElementById('editTextarea').value;
-  if(currentEditId){
-    document.getElementById(`note_${currentEditId}`).value = newText;
-  }
-  document.getElementById('editPopup').style.display = 'none';
-}
-
-/* === Tambah Deviation Manual === */
+/* === Tambah Deviation === */
 function addDeviation(){
   deviationCount++;
   const id = "dev"+deviationCount;
   const div = document.createElement('div');
   div.className = "card";
-  div.id = `card_${id}`;
   const allowImg = document.getElementById('allowImage').checked;
   div.innerHTML = `
-    <div class="dev-header">
-      <label>Deviation ${deviationCount}</label>
-      <button class="delete-btn" onclick="deleteDeviation('${id}')">🗑️</button>
-    </div>
-    <textarea id="note_${id}" placeholder="Tuliskan deviation..." onclick="openEdit('${id}')"></textarea>
+    <label>Deviation ${deviationCount}</label>
+    <textarea id="note_${id}" placeholder="Tuliskan deviation..."></textarea>
     ${allowImg ? `<input type="file" accept="image/*" id="img_${id}" onchange="previewImage('${id}', event)">` : ''}
     <img id="preview_${id}" class="preview">
   `;
   document.getElementById('deviationList').appendChild(div);
 }
-function deleteDeviation(id){
-  const card = document.getElementById(`card_${id}`);
-  if(card) card.remove();
-}
 
-/* === Preview & WhatsApp === */
+/* === Preview dan WA === */
 function showPreview(){
-  document.getElementById('previewPopup').style.display='block';
+  const popup = document.getElementById('previewPopup');
   document.getElementById('previewText').textContent = generateText();
+  const allImages = document.querySelectorAll('img.preview');
+  const imgContainer = document.getElementById('allPreviewImages');
+  imgContainer.innerHTML = "";
+  allImages.forEach(img=>{
+    if(img.src && img.style.display==="block"){
+      const imgClone = document.createElement('img');
+      imgClone.src = img.src;
+      imgContainer.appendChild(imgClone);
+    }
+  });
+  popup.style.display = 'block';
 }
-function closePopup(){ document.getElementById('previewPopup').style.display='none'; }
 
 function generateText(){
-  let text=`*QA Inspection HD785-7*\n\n📅 ${tgl.value}\n👷 ${mekanik.value}\n🚗 ${cn.value}\n⌛ ${hm.value}\n\n`;
+  let text=`*QA Inspection HD785-7*\n\n📅 ${tgl.value}\n👷 ${mekanik.value}\n🚗 CN: ${cn.value}\n⌛ HM: ${hm.value}\n\n`;
   inspectionSections.forEach(sec=>{
     text+=`🧩 *${sec.name}*\n`;
     sec.items.forEach((item,idx)=>{
@@ -289,7 +238,6 @@ function generateText(){
     });
     text+=`\n`;
   });
-
   text += `⚠️ *Deviation Manual:*\n`;
   for(let i=1;i<=deviationCount;i++){
     const id="dev"+i;
@@ -298,17 +246,18 @@ function generateText(){
       text += `• ${note.value.trim()}\n`;
     }
   }
-
   return text;
 }
+
+function sendToWhatsApp(){
+  const msg = encodeURIComponent(generateText());
+  window.open(`https://wa.me/?text=${msg}`, '_blank');
+}
 function copyText(){
-  navigator.clipboard.writeText(previewText.textContent);
+  navigator.clipboard.writeText(document.getElementById('previewText').textContent);
   alert('✅ Teks disalin!');
 }
-function sendToWhatsApp(){
-  const msg=encodeURIComponent(generateText());
-  window.open(`https://wa.me/?text=${msg}`,'_blank');
-}
+function closePopup(){ document.getElementById('previewPopup').style.display='none'; }
 </script>
 </body>
 </html>
