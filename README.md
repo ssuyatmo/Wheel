@@ -31,7 +31,7 @@ header {
 }
 .container {
   padding: 10px; max-width: 600px; margin: auto;
-  margin-top: 260px;
+  margin-top: 300px;
 }
 .card {
   background: #fff; border-radius: 10px;
@@ -68,7 +68,7 @@ button.main {
   background: #f1d28a; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* Popup preview & edit temuan */
+/* Popup */
 #previewPopup, #editPopup {
   display: none; position: fixed; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
@@ -85,12 +85,20 @@ button.main {
   width: 100%; height: 100px; resize: none;
   border-radius: 6px; border: 1px solid #aaa; padding: 6px;
 }
+.dev-header {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.delete-btn {
+  background: #ffb3b3; border: none; padding: 4px 8px;
+  border-radius: 5px; cursor: pointer;
+}
+.delete-btn:hover { background: #ff6666; color: white; }
 
 /* Responsive */
 @media (max-width: 480px){
   header{font-size:16px;padding:8px 0;}
   .fixed-header{top:50px;padding:6px;}
-  .container{margin-top:230px;padding:8px;}
+  .container{margin-top:250px;padding:8px;}
 }
 </style>
 </head>
@@ -112,6 +120,9 @@ button.main {
     <label>👷 Mekanik:</label><input type="text" id="mekanik">
     <label>🚗 CN Unit:</label><input type="text" id="cn">
     <label>⌛ HM:</label><input type="number" id="hm">
+  </div>
+  <div class="card">
+    <label><input type="checkbox" id="allowImage" checked> ✅ Izinkan unggah foto/gambar</label>
   </div>
 </div>
 
@@ -151,18 +162,6 @@ button.main {
 </div>
 
 <script>
-const sectionsData = {
-  QA1: { title: "Validasi & Kelengkapan Checklist Service", items: [
-      "Job Card & Cover Checklist","Form Observasi Redo PS","Form QA 1 & QA 7","Form PPM",
-      "Form Check List A","Form Check List B","Form Check List C","Form Backlog",
-      "Form FUI","Form Repair Order","Form Combine Maintenance","Form Service Activity Report"
-  ]},
-  QA7: { title: "Kelengkapan Pengisian Checklist Service", items: [
-      "Job Card & Cover Checklist","Form Observasi Redo PS","Form QA 1 & QA 7","Form PPM",
-      "Form Check List A","Form Check List B","Form Check List C","Form Backlog",
-      "Form FUI","Form Repair Order","Form Combine Maintenance","Form Service Activity Report"
-  ]}
-};
 const inspectionSections = [
   { name: "Oil Level", items: ["Engine oil level","Transmission oil level","Hydraulic oil level"] },
   { name: "Engine Area", items: ["Belt tension","Engine oil leakage","Common Rail Connector","Injector Tube"] },
@@ -175,9 +174,7 @@ let currentEditId = null;
 let deviationCount = 0;
 
 function renderSections(){
-  const qaType = document.getElementById('qaType').value;
   let html = "";
-
   inspectionSections.forEach(sec=>{
     html += `<div class="card"><h3>${sec.name}</h3>`;
     sec.items.forEach((item, idx)=>{
@@ -196,36 +193,20 @@ function renderSections(){
     });
     html += `</div>`;
   });
-
-  const validasi = sectionsData[qaType];
-  html += `<div class="card"><h3>${validasi.title}</h3>`;
-  validasi.items.forEach((v,i)=>{
-    const id="val"+i;
-    html += `
-      <div class="label">
-        <span>${v}</span>
-        <div>
-          <button class="ok active" onclick="toggleButton(this,'OK','${id}')">OK</button>
-          <button class="notok" onclick="toggleButton(this,'Not OK','${id}')">Not OK</button>
-        </div>
-      </div>`;
-  });
-  html += `</div>`;
   document.getElementById('sections').innerHTML = html;
 }
 renderSections();
-document.getElementById('qaType').addEventListener('change', renderSections);
 
 function toggleButton(el,val,id){
   const parent = el.parentElement;
   parent.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
   el.classList.add('active');
   el.dataset.value = val;
-
+  const allowImg = document.getElementById('allowImage').checked;
   const imgInput = document.getElementById(`img_${id}`);
   const previewImg = document.getElementById(`preview_${id}`);
   if(imgInput){
-    if(val === 'Not OK'){
+    if(val === 'Not OK' && allowImg){
       imgInput.style.display = 'block';
       previewImg.style.display = previewImg.src ? 'block' : 'none';
     } else {
@@ -269,16 +250,25 @@ function addDeviation(){
   const id = "dev"+deviationCount;
   const div = document.createElement('div');
   div.className = "card";
+  div.id = `card_${id}`;
+  const allowImg = document.getElementById('allowImage').checked;
   div.innerHTML = `
-    <label>Deviation ${deviationCount}:</label>
+    <div class="dev-header">
+      <label>Deviation ${deviationCount}</label>
+      <button class="delete-btn" onclick="deleteDeviation('${id}')">🗑️</button>
+    </div>
     <textarea id="note_${id}" placeholder="Tuliskan deviation..." onclick="openEdit('${id}')"></textarea>
-    <input type="file" accept="image/*" id="img_${id}" onchange="previewImage('${id}', event)">
+    ${allowImg ? `<input type="file" accept="image/*" id="img_${id}" onchange="previewImage('${id}', event)">` : ''}
     <img id="preview_${id}" class="preview">
   `;
   document.getElementById('deviationList').appendChild(div);
 }
+function deleteDeviation(id){
+  const card = document.getElementById(`card_${id}`);
+  if(card) card.remove();
+}
 
-/* === Preview WhatsApp === */
+/* === Preview & WhatsApp === */
 function showPreview(){
   document.getElementById('previewPopup').style.display='block';
   document.getElementById('previewText').textContent = generateText();
@@ -286,10 +276,7 @@ function showPreview(){
 function closePopup(){ document.getElementById('previewPopup').style.display='none'; }
 
 function generateText(){
-  const qaType=document.getElementById('qaType').value;
-  let text=`*${qaType==='QA1'?'QA-1 Pre Inspection':'QA-7 Final Inspection'}*\n\n`;
-  text+=`📅 ${tgl.value}\n👷 ${mekanik.value}\n🚗 ${cn.value}\n⌛ ${hm.value}\n\n`;
-
+  let text=`*QA Inspection HD785-7*\n\n📅 ${tgl.value}\n👷 ${mekanik.value}\n🚗 ${cn.value}\n⌛ ${hm.value}\n\n`;
   inspectionSections.forEach(sec=>{
     text+=`🧩 *${sec.name}*\n`;
     sec.items.forEach((item,idx)=>{
@@ -303,7 +290,6 @@ function generateText(){
     text+=`\n`;
   });
 
-  // Deviation list
   text += `⚠️ *Deviation Manual:*\n`;
   for(let i=1;i<=deviationCount;i++){
     const id="dev"+i;
@@ -315,7 +301,6 @@ function generateText(){
 
   return text;
 }
-
 function copyText(){
   navigator.clipboard.writeText(previewText.textContent);
   alert('✅ Teks disalin!');
