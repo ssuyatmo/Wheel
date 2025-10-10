@@ -87,7 +87,7 @@ button.main {
 }
 #popupButtons { display: flex; justify-content: space-around; }
 img#photoPreview {
-  display: block; margin: 8px auto; max-width: 100%; border-radius: 8px;
+  display: block; margin: 8px auto; max-width: 50%; border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 </style>
