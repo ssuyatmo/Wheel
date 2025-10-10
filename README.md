@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Checklist HD785-7</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QA Inspection HD785-7</title>
 <style>
 body {
   font-family: "Poppins", sans-serif;
@@ -12,6 +12,7 @@ body {
   color: #222;
 }
 
+/* === HEADER UTAMA === */
 header {
   position: fixed;
   top: 0;
@@ -27,9 +28,10 @@ header {
   z-index: 100;
 }
 
+/* === FORM INPUT DI BAWAH HEADER (FIXED) === */
 .fixed-header {
   position: fixed;
-  top: 60px;
+  top: 60px; /* jarak di bawah header 🌿 */
   left: 0;
   width: 100%;
   background: #d8e9a8;
@@ -46,12 +48,18 @@ header {
   margin-bottom: 8px;
 }
 
-/* === BAGIAN KONTEN UTAMA === */
+.fixed-header label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+/* === KONTEN SCROLL === */
 .container {
   padding: 10px;
   max-width: 600px;
   margin: auto;
-  transition: margin-top 0.3s ease;
+  margin-top: 0; /* otomatis diatur via JS */
 }
 
 .card {
@@ -116,141 +124,314 @@ button.main {
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* === POPUP TEXTAREA MELAYANG === */
-#popupTemuan {
+/* === POPUP PREVIEW === */
+#previewPopup {
   display: none;
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(3px);
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.popup-box {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
   width: 90%;
   max-width: 400px;
+  z-index: 200;
   padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
-
-.popup-box h4 {
-  margin: 0;
-  text-align: center;
-  font-size: 16px;
-  background: #d8e9a8;
-  padding: 6px;
-  border-radius: 8px;
+#previewPopup pre {
+  max-height: 60vh;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  font-size: 13px;
+  margin-bottom: 10px;
 }
-
-.popup-box textarea {
-  height: 120px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  padding: 8px;
-  font-size: 14px;
-}
-
-.popup-box .actions {
+#popupButtons {
   display: flex;
   justify-content: space-around;
 }
 
-.popup-box button {
-  padding: 6px 14px;
+/* === POPUP TEMUAN (melayang saat ngetik) === */
+#notePopup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  width: 90%;
+  max-width: 400px;
+  z-index: 300;
+  padding: 15px;
+}
+#notePopup textarea {
+  width: 100%;
+  height: 120px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  padding: 8px;
+  resize: none;
+}
+#notePopup button {
+  margin-top: 10px;
+  padding: 6px 10px;
   border: none;
   border-radius: 8px;
+  background: #4caf50;
+  color: #fff;
   font-weight: bold;
   cursor: pointer;
-  background: #f1d28a;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
+/* === RESPONSIVE UNTUK HP === */
+@media (max-width: 480px) {
+  header {
+    font-size: 16px;
+    padding: 8px 0;
+  }
+  .fixed-header {
+    top: 50px;
+    padding: 6px;
+  }
+  input, select, textarea {
+    font-size: 12px;
+  }
+}
 </style>
 </head>
 <body>
 
-<header>Checklist Harian HD785-7</header>
+<header>🌿 QA Inspection Komatsu HD785-7</header>
 
-<div class="fixed-header">
+<!-- BAGIAN INPUT FIXED -->
+<div class="fixed-header" id="fixedHeader">
   <div class="card">
-    <label>Operator</label>
-    <input type="text" placeholder="Nama Operator">
+    <label>Pilih Jenis QA:
+      <select id="qaType">
+        <option value="QA1">QA-1 (Pre Inspection)</option>
+        <option value="QA7">QA-7 (Final Inspection)</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="card">
+    <label>📅 Tanggal:</label><input type="date" id="tgl">
+    <label>👷 Mekanik:</label><input type="text" id="mekanik">
+    <label>🚗 CN Unit:</label><input type="text" id="cn">
+    <label>⌛ HM:</label><input type="number" id="hm">
   </div>
 </div>
 
-<div class="container">
-  <div class="card">
-    <h3>Oil Level</h3>
-    <div class="label">
-      <span>Engine Oil</span>
-      <button class="ok">OK</button>
-      <button class="notok">NOT OK</button>
-    </div>
-    <div class="label">
-      <span>Hydraulic Oil</span>
-      <button class="ok">OK</button>
-      <button class="notok">NOT OK</button>
-    </div>
+<!-- ISI UTAMA -->
+<div class="container" id="mainContent">
+  <div id="sections"></div>
 
-    <button class="main" onclick="openPopup()">Input Temuan</button>
+  <div class="buttons">
+    <button class="main" onclick="showPreview()">🧾 Preview</button>
+    <button class="main" onclick="sendToWhatsApp()">📤 Send WA</button>
   </div>
 </div>
 
-<!-- === POPUP MELAYANG UNTUK TEMUAN === -->
-<div id="popupTemuan">
-  <div class="popup-box">
-    <h4>Catat Temuan</h4>
-    <textarea id="inputTemuan" placeholder="Tuliskan temuan di sini..."></textarea>
-    <div class="actions">
-      <button onclick="saveTemuan()">Simpan</button>
-      <button onclick="closePopup()">Batal</button>
-    </div>
+<!-- POPUP PREVIEW -->
+<div id="previewPopup">
+  <pre id="previewText"></pre>
+  <div id="popupButtons">
+    <button onclick="copyText()">📋 Copy</button>
+    <button onclick="sendToWhatsApp()">📤 Send WA</button>
+    <button onclick="closePopup()">❌ Close</button>
   </div>
+</div>
+
+<!-- POPUP INPUT TEMUAN -->
+<div id="notePopup">
+  <h3>📝 Tulis Temuan</h3>
+  <textarea id="popupTextarea" placeholder="Ketik temuan di sini..."></textarea>
+  <button onclick="saveNote()">Simpan</button>
 </div>
 
 <script>
-// === Atur margin container otomatis ===
-function adjustContainerMargin() {
-  const header = document.querySelector('header');
-  const fixed = document.querySelector('.fixed-header');
-  const container = document.querySelector('.container');
-  if (header && fixed && container) {
-    const totalHeight = header.offsetHeight + fixed.offsetHeight + 20;
-    container.style.marginTop = totalHeight + 'px';
-  }
-}
-window.addEventListener('load', adjustContainerMargin);
-window.addEventListener('resize', adjustContainerMargin);
+const sectionsData = {
+  QA1: { title: "Validasi & Kelengkapan Checklist Service", items: [
+      "Job Card & Cover Checklist","Form Observasi Redo PS","Form QA 1 & QA 7","Form PPM",
+      "Form Check List A","Form Check List B","Form Check List C","Form Backlog",
+      "Form FUI","Form Repair Order","Form Combine Maintenance","Form Service Activity Report"
+  ]},
+  QA7: { title: "Kelengkapan Pengisian Checklist Service", items: [
+      "Job Card & Cover Checklist","Form Observasi Redo PS","Form QA 1 & QA 7","Form PPM",
+      "Form Check List A","Form Check List B","Form Check List C","Form Backlog",
+      "Form FUI","Form Repair Order","Form Combine Maintenance","Form Service Activity Report"
+  ]}
+};
 
-// === Fungsi Popup Temuan ===
-function openPopup() {
-  document.getElementById('popupTemuan').style.display = 'flex';
-}
-function closePopup() {
-  document.getElementById('popupTemuan').style.display = 'none';
-}
-function saveTemuan() {
-  const teks = document.getElementById('inputTemuan').value.trim();
-  if (teks !== "") alert("Temuan tersimpan:\n" + teks);
-  closePopup();
-}
+const inspectionSections = [
+  { name: "Oil Level", items: ["Engine oil level","Transmission oil level","Hydraulic oil level"] },
+  { name: "Engine Area", items: [
+    "Belt tension","Engine oil leakage","Common Rail Connector","Injector Tube",
+    {label:"Common rail pressure (ON)", type:"number", unit:"MPa"},
+    {label:"Power Supply (ON)", type:"number", unit:"V"}
+  ]},
+  { name: "Cabin Area", items: ["FM Radio","Fatigue Warning","Power Window"] },
+  { name: "Frame Area", items: ["Operator seat","Hand Rail"] },
+  { name: "Suspension Pressure (on monitor panel)", items: [
+    {label:"FL", type:"number", unit:"MPa"},
+    {label:"FR", type:"number", unit:"MPa"},
+    {label:"RL", type:"number", unit:"MPa"},
+    {label:"RR", type:"number", unit:"MPa"}
+  ]},
+  { name: "Tyre Condition", items: ["Tyre Condition"] }
+];
 
-// Tombol OK/NOT OK toggle
-document.querySelectorAll('.ok, .notok').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    const group = btn.parentElement.querySelectorAll('.ok, .notok');
-    group.forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
+let currentTextarea = null;
+
+function renderSections(){
+  const qaType = document.getElementById('qaType').value;
+  let html = "";
+
+  inspectionSections.forEach(sec=>{
+    html += `<div class="card"><h3>${sec.name}</h3>`;
+    sec.items.forEach((item, idx)=>{
+      const id = sec.name.replace(/\s+/g,'')+idx;
+      if(typeof item === 'object' && item.type === 'number'){
+        html += `<label>${item.label}:<input type="number" id="num_${id}" step="0.1" placeholder="Masukkan nilai (${item.unit})..."></label>`;
+      } else {
+        html += `
+        <div class="label">
+          <span>${item}</span>
+          <div>
+            <button class="ok active" onclick="toggleButton(this,'OK','${id}')">OK</button>
+            <button class="notok" onclick="toggleButton(this,'Not OK','${id}')">Not OK</button>
+          </div>
+        </div>
+        <textarea id="note_${id}" placeholder="Tulis temuan jika ada..." onclick="openNotePopup(this)"></textarea>`;
+      }
+    });
+    html += `</div>`;
   });
-});
+
+  const validasi = sectionsData[qaType];
+  html += `<div class="card"><h3>${validasi.title}</h3>`;
+  validasi.items.forEach((v,i)=>{
+    const id="val"+i;
+    html += `
+      <div class="label">
+        <span>${v}</span>
+        <div>
+          <button class="ok active" onclick="toggleButton(this,'OK','${id}')">OK</button>
+          <button class="notok" onclick="toggleButton(this,'Not OK','${id}')">Not OK</button>
+        </div>
+      </div>`;
+  });
+  html += `</div><div class="card"><h3>⚠️ Deviation (Tambahkan jika ada)</h3><textarea id="manualDeviation" rows="3" placeholder="Tambahkan deviation manual..."></textarea></div>`;
+  
+  document.getElementById('sections').innerHTML = html;
+  updateCardColors();
+  adjustContainerMargin();
+}
+renderSections();
+document.getElementById('qaType').addEventListener('change', renderSections);
+
+function toggleButton(el,val,id){
+  const parent = el.parentElement;
+  parent.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+  el.classList.add('active');
+  el.dataset.value = val;
+  updateCardColors();
+}
+
+function updateCardColors() {
+  document.querySelectorAll('.card').forEach(card => {
+    const notOkBtn = card.querySelector('.notok.active');
+    if (notOkBtn) {
+      card.style.background = '#f8d7da';
+    } else {
+      card.style.background = '#fff';
+    }
+  });
+}
+
+function adjustContainerMargin(){
+  const headerHeight = document.querySelector('header').offsetHeight;
+  const fixedHeight = document.querySelector('.fixed-header').offsetHeight;
+  document.querySelector('.container').style.marginTop = (headerHeight + fixedHeight + 20) + "px";
+}
+
+function openNotePopup(textarea){
+  currentTextarea = textarea;
+  document.getElementById('popupTextarea').value = textarea.value;
+  document.getElementById('notePopup').style.display='block';
+}
+
+function saveNote(){
+  if(currentTextarea){
+    currentTextarea.value = document.getElementById('popupTextarea').value;
+  }
+  document.getElementById('notePopup').style.display='none';
+}
+
+function showPreview(){
+  document.getElementById('previewPopup').style.display='block';
+  document.getElementById('previewText').textContent = generateText();
+}
+
+function generateText(){
+  const qaType=document.getElementById('qaType').value;
+  let text=`*${qaType==='QA1'?'QA-1 Pre Inspection':'QA-7 Final Inspection'}*\n\n`;
+  text+=`📅 Tanggal : ${tgl.value}\n👷 Mekanik : ${mekanik.value}\n🚗 CN : ${cn.value}\n⌛ HM : ${hm.value}\n\n---\n`;
+
+  let deviations=[];
+
+  inspectionSections.forEach(sec=>{
+    text+=`🧩 *${sec.name}*\n`;
+    sec.items.forEach((item,idx)=>{
+      const id=sec.name.replace(/\s+/g,'')+idx;
+      if(typeof item==='object' && item.type==='number'){
+        const val=document.getElementById(`num_${id}`).value;
+        text+=`${item.label} : ${val?val+' '+item.unit:'-'}\n`;
+      } else {
+        const ok=document.querySelector(`#note_${id}`).previousElementSibling.querySelector('.ok.active');
+        const notok=document.querySelector(`#note_${id}`).previousElementSibling.querySelector('.notok.active');
+        const status=ok?'✅ OK':notok?'❌ Not OK':'❔';
+        text+=`${item} : ${status}\n`;
+        const note=document.getElementById(`note_${id}`).value.trim();
+        if(note) deviations.push(`⚠️ ${note}`);
+      }
+    });
+    text+=`\n`;
+  });
+
+  const qaSection=sectionsData[qaType];
+  text+=`📝 *${qaSection.title}*\n`;
+  qaSection.items.forEach((v,i)=>{
+    const id="val"+i;
+    const ok=document.querySelector(`[onclick*="${id}"].ok.active`);
+    const notok=document.querySelector(`[onclick*="${id}"].notok.active`);
+    text+=`${v} : ${ok?'✅ OK':notok?'❌ Not OK':'❔'}\n`;
+  });
+
+  const manualDev=document.getElementById('manualDeviation').value.trim();
+  if(manualDev) manualDev.split('\n').forEach(d=>deviations.push(`⚠️ ${d.trim()}`));
+  
+  text+=`\n⚠️ *Deviation:*\n`+(deviations.length?deviations.join('\n'):'Tidak ada')+'\n';
+  return text;
+}
+
+function copyText(){
+  navigator.clipboard.writeText(previewText.textContent);
+  alert('✅ Teks disalin!');
+}
+
+function sendToWhatsApp(){
+  const msg=encodeURIComponent(generateText());
+  window.open(`https://wa.me/?text=${msg}`,'_blank');
+}
+
+function closePopup(){
+  previewPopup.style.display='none';
+}
 </script>
+
 </body>
 </html>
